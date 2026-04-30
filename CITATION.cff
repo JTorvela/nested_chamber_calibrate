@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+
+title: "Testproject"
+
+message: >
+  If you use this software, please cite it using the metadata below.
+  A Zenodo DOI will be provided when available.
+
+type: software
+
+authors:
+  - given-names: "Janne"
+    family-names: "Torvela"
+    affiliation: "University of Oulu"
+    email: "janne.torvela@oulu.fi"
+    orcid: "https://orcid.org/0000-0002-5032-3508"
+
+
+
+identifiers:
+  - type: url
+    value: "https://github.com/JTorvela/testproject"
+    description: GitHub repository
+
+
+
+repository-code: "https://github.com/JTorvela/testproject"
+
+url: "https://github.com/JTorvela/testproject"
+
+abstract: >
+  Calibration analysis of DS18B20 temperature sensors
+
+keywords:
+  - research
+  - open-science
+  - reproducibility
+
+license: "CC-BY-4.0"
+
+version: "0.1.0"
+
+date-released: "2026"
