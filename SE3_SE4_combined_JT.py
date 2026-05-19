@@ -195,7 +195,7 @@ def main():
         plt.grid(alpha=0.3)
         plt.tight_layout()
         #plt.show()
-        plt.savefig('figures/{}'.format(y_column), dpi = 72)
+        plt.savefig('figures/' + str(y_column), dpi = 72)
             
         #Using the validation and test sets to draw residuals
         plot_residuals(x, y, mean_coeffs, "bootstrap model validation") 
@@ -316,7 +316,7 @@ def plot_residuals(x, y, coeffs, modelname):
     plt.title(f"Residual Plot {modelname}")
     plt.ylim(-0.2, 0.2)
     #plt.show()
-    plt.savefig('figures/{}'.format(modelname), dpi = 72)
+    plt.savefig('figures/' + str(modelname), dpi = 72)
        
 #Note: run main only if executed as a script, not when imported
 if __name__ == "__main__": 
