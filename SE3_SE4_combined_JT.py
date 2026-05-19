@@ -184,7 +184,7 @@ def main():
         print("Naive fit model :", naive_coeffs)
         print("     Difference :", diff_models)
         
-        #Plot the error curve of the sensor
+        #Plot the error curve of the sensor and save to file
         err = df[x_column] - df[y_column]
         plt.figure(figsize=(10,4))
         plt.plot(df[y_column], err, marker='.', linestyle='None', color='C1')
@@ -195,9 +195,12 @@ def main():
         plt.grid(alpha=0.3)
         plt.tight_layout()
         #plt.show()
-        plt.savefig('figures/' + str(y_column), dpi = 72)
+        filename = f"figures/{y_column}.png"
+        plt.savefig(filename, dpi = 72)
+        plt.close()
+        print("Saved:", filename)
             
-        #Using the validation and test sets to draw residuals
+        #Using the validation and test sets to plot residuals
         plot_residuals(x, y, mean_coeffs, "bootstrap model validation") 
         plot_residuals(x, y, naive_coeffs, "naive model validation")
         plot_residuals(x_test, y_test, mean_coeffs, "bootstrap model test") 
@@ -316,7 +319,10 @@ def plot_residuals(x, y, coeffs, modelname):
     plt.title(f"Residual Plot {modelname}")
     plt.ylim(-0.2, 0.2)
     #plt.show()
-    plt.savefig('figures/' + str(modelname), dpi = 72)
+    filename = f"figures/{modelname}.png"
+    plt.savefig(filename, dpi = 72)
+    plt.close()
+    print("Saved:", filename)
        
 #Note: run main only if executed as a script, not when imported
 if __name__ == "__main__": 
