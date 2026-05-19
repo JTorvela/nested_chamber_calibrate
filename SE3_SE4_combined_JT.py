@@ -195,8 +195,8 @@ def main():
         plt.grid(alpha=0.3)
         plt.tight_layout()
         #plt.show()
-        filename = f"figures/{y_column}.png"
-        plt.savefig(filename, dpi = 72)
+        figurename = f"figures/{y_column}.png"
+        plt.savefig(figurename, dpi = 72)
         plt.close()
         print("Saved:", filename)
             
@@ -319,10 +319,10 @@ def plot_residuals(x, y, coeffs, modelname):
     plt.title(f"Residual Plot {modelname}")
     plt.ylim(-0.2, 0.2)
     #plt.show()
-    filename = f"figures/{modelname}.png"
-    plt.savefig(filename, dpi = 72)
+    figurename = f"figures/{modelname}.png"
+    plt.savefig(figurename, dpi = 72)
     plt.close()
-    print("Saved:", filename)
+    print("Saved:", figurename)
        
 #Note: run main only if executed as a script, not when imported
 if __name__ == "__main__": 
