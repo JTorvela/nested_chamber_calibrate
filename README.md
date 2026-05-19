@@ -80,7 +80,8 @@ python run_reproducibility.py
 
 Display key figures in `/figures` folder, with description:
 
-![Example](figures/example.png)
+[Example](figures/example_error.png)
+[Example](figures/example_residual.png)
 
 ## Citation
 
