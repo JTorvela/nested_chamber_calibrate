@@ -21,9 +21,6 @@
    2) Test simple vs. bootstrap fit for producing calibration curves
    3) Produce calibration coefficients, metrics, for all sensors (batch = True)
     
-#TODO: Wrap this up in a nice Github repository and write full documentation
-#Temporary: URL to data in repository embedded for testing purposes.
-#The script will automatically access URL if data file is not found.    
 """
 
 import sys
@@ -38,9 +35,8 @@ import re #regular expressions
 np.random.seed(42)
 
 #Data definitions
-url = "https://github.com/JTorvela/Test-repository/blob/main/datatest/tokauunitus_data.csv"   
-filename = "tokauunitus_data.csv" 
-out_path = "results.csv"     
+filename = "inputs/example_data.csv" 
+out_path = "results/results.csv"     
 
 #Regression parameters
 y_column = "temp.vai" #Vaisala TMP1 precision reference sensor
