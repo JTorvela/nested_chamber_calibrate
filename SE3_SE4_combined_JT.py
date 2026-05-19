@@ -195,16 +195,16 @@ def main():
         plt.grid(alpha=0.3)
         plt.tight_layout()
         #plt.show()
-        figurename = f"figures/{y_column}.png"
-        plt.savefig(figurename, dpi = 72)
+        figurename = f"figures/Errorplot_{x_column}.png"
+        plt.savefig(figurename, dpi = 100)
         plt.close()
-        print("Saved:", filename)
+        print("Saved:", figurename)
             
         #Using the validation and test sets to plot residuals
-        plot_residuals(x, y, mean_coeffs, "bootstrap model validation") 
-        plot_residuals(x, y, naive_coeffs, "naive model validation")
-        plot_residuals(x_test, y_test, mean_coeffs, "bootstrap model test") 
-        plot_residuals(x_test, y_test, naive_coeffs, "naive model test")
+        plot_residuals(x, y, mean_coeffs, f"bootstrap model validation {x_column}") 
+        plot_residuals(x, y, naive_coeffs, f"naive model validation {x_column}")
+        plot_residuals(x_test, y_test, mean_coeffs, f"bootstrap model test {x_column}") 
+        plot_residuals(x_test, y_test, naive_coeffs, f"naive model test {x_column}")
 
         
 """
@@ -320,7 +320,7 @@ def plot_residuals(x, y, coeffs, modelname):
     plt.ylim(-0.2, 0.2)
     #plt.show()
     figurename = f"figures/{modelname}.png"
-    plt.savefig(figurename, dpi = 72)
+    plt.savefig(figurename, dpi = 100)
     plt.close()
     print("Saved:", figurename)
        
