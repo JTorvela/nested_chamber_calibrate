@@ -50,14 +50,14 @@ batch = False
 ##################### Main script starts here #################################
 """
 def main():
+    print(f"Looking for input data {filename}")
     try:
         df = pd.read_csv(filename)
     except Exception as e:
         print(f"Error loading CSV: {e}")
-        if not os.path.exists(filename):    #temporary 
-            df = load_csv_from_github(url)
-            print("Trying from github...")
-            #sys.exit(1)
+        if not os.path.exists(filename):    
+            print("Input data could not be found.")
+            sys.exit(1)
     print(f"Found {filename}")
 
     if y_column not in df.columns:
@@ -65,20 +65,17 @@ def main():
         sys.exit(1)
     else:
         print("Reference temperature data found as temp.vai")    
+        print(f"Found: {len(df)} rows of data, including: ")
+        print(df.head(5))
+        total_groups, group_counts = count_groups_and_members(df)
+        print(f"\nFound {total_groups} groups of sensors. Sensors by group:")
+        for g, cnt in group_counts.items():
+            print(f"g{g}.ID0 ... g{g}.ID{cnt-1}  -> {cnt} sensors")
 
-    print(f"Found: {len(df)} rows of data, including: ")
-    print(df.head(5))
-    
-    total_groups, group_counts = count_groups_and_members(df)
-    print(f"\nFound {total_groups} groups of sensors. Sensors by group:")
-    for g, cnt in group_counts.items():
-        print(f"g{g}.ID0 ... g{g}.ID{cnt-1}  -> {cnt} sensors")
-    
-        
+ #If we're not running the whole batch, ask the user which sensor they want
     if not batch:
         all_ids = [select_x_column(df, y_column)]
-    
-    if batch:
+    else:
         all_ids = [
             f"g{g}.ID{i}"
             for g in range(total_groups)
@@ -197,7 +194,8 @@ def main():
         plt.ylabel("Temperature error [C]")
         plt.grid(alpha=0.3)
         plt.tight_layout()
-        plt.show()
+        #plt.show()
+        plt.savefig('figures/{}'.format(y_column), dpi = 72)
             
         #Using the validation and test sets to draw residuals
         plot_residuals(x, y, mean_coeffs, "bootstrap model validation") 
@@ -211,19 +209,6 @@ def main():
 
 Function definitions:
 """
-
-#load from github function will be removed in future versions.
-def load_csv_from_github(url: str) -> pd.DataFrame:
-    """
-    Load a CSV file from a GitHub raw URL into a pandas DataFrame.
-    If the provided URL is a regular GitHub file URL, this function will
-    attempt to convert it to the raw URL form.
-    """
-    # Convert common GitHub URL form to raw URL if needed
-    if "github.com" in url and "raw.githubusercontent.com" not in url:
-        # Example: https://github.com/user/repo/blob/branch/path/to/file.csv
-        url = url.replace("github.com/", "raw.githubusercontent.com/").replace("/blob/", "/")
-    return pd.read_csv(url)
 
 def count_groups_and_members(df: pd.DataFrame):
     """
@@ -330,7 +315,8 @@ def plot_residuals(x, y, coeffs, modelname):
     plt.ylabel("Residual (reference - model)")
     plt.title(f"Residual Plot {modelname}")
     plt.ylim(-0.2, 0.2)
-    plt.show()
+    #plt.show()
+    plt.savefig('figures/{}'.format(modelname), dpi = 72)
        
 #Note: run main only if executed as a script, not when imported
 if __name__ == "__main__": 
