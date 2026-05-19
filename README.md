@@ -1,41 +1,53 @@
-# Testproject
+# nested_chamber_calibrate
 
 **Author:** Janne Erik Torvela  
 **Contact:** janne.torvela@oulu.fi
-**Organization:** University of Oulu
-**Website:** https://github.com/JTorvela/testproject
+**Organization:** University of Oulu / Oulun Yliopisto
+**Website:** https://github.com/JTorvela/nested_chamber_calibrate
 
 ## Project Overview
-Calibration analysis of DS18B20 temperature sensors
-Breifly describe your research for anyone who finds this repository before reading your manuscript.* problem statement: why does your research matter
-* problem statement: what overarching theoretical, applied, societal, environmental problem does your research address? 
-* challenge statement: why has this problem not been solved before?
-* solution statement: what specific element of the challenge does your research resolve?
-* objective: how will you accomplish this?
-* literature review: focus on foundational or methods papers that closely describe your analytical workflow.
-* research questions: focus on testable hypothesis, even if you're not a frequentist. 
+Batch calibration analysis of DS18B20 temperature sensors.
 
+The error characteristic of a DS18B20 digital temperature sensors is described by the manufacturer as a second order curve (Maxim Integrated 2002). To compensate for the error, we need to find a closely fitting second order function described by its coefficients ax + bx^2 + c for each sensor. Since the temperature measured by the sensor is not continuously variable but quantized to a resolution of 0.0625 C at the full resolution of the sensor (Maxim Integrated 2019), inherent sensor noise and system variations cause each sensor sample to switch randomly between discrete values and the resulting distribution does not fall neatly around a mean. This statistical property may cause biases with simple regresson model fitting. A distribution-independent resampling method known as bootstrapping is used to assess the properties of the distribution underlying the sample. This method involves randomly selecting a portion of the data, fitting the regression model of the calibration function to the selection, and testing the model against the remaining data, repeatedly for thousands of times. The mean of the regression model results can then be used for the final calibration function. (Efron 1979; Davison 1997).
+
+To ensure that the comparisons between a reference sensor and the sensors being calibrated are valid, we must ensure that all sensors have stabilized to the same temperature inside an isolated enclosure (Elyounsi, Kalashnikov 2021). This was accomplished by placing the batch of sensors inside an insulated box with a large thermal mass in the form of a heavy aluminium heatsink with radiating fins. Small computer fans provide sufficient mixing and transfer of heat within the insulated container. The fins of the aluminium heatsink are exposed to the outside of the box, enabling heat exchange with the environment. The box was then placed inside an environmental simulation chamber and cycled between -40 C and +40 C in discrete steps over two days with continuous uninterrupted logging of data from all sensors. This nested chamber design diminishes the effect of thermostat hysteresis of the environmental simulation chamber. The reference sensor is a Vaisala TMP-1 platinum resistance sensor calibrated to a certified accuracy better than +/- 0.01 C over the measured temperature range. The system was allowed to stabilize for two hours at each temperature, and 400 points of data were manually selected from each step. 
+
+This project repository contains a set of measured data for a single batch of DS18B20 type temperature sensors and an example script for the process of deriving the calibration functions for each sensor.  In the example script, a comparison is made between a bootstrapped model and directly fitting a regression model to the available data without resampling, using an 80/20 split between model training and validation. This comparison is made to determine whether the bootstrapping method is necessary for useful results. 
+
+References:
+
+Elyounsi A., Kalashnikov A.N., 2021, Evaluating Suitability of a DS18B20 Temperature Sensor for Use in an Accurate Air Temperature Distribution Measurement Network. Eng. Proc. 2021, 10, 56. https://doi.org/10.3390/ecsa-8-11277 
+Maxim Integrated Products Inc., 2019, Programmable Resolution 1-Wire Digital Thermometer, https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf (accessed 30.1.2026)
+Maxim Integrated Products Inc., 2002, Application note 208. Curve Fitting the Error of a Bandgap-Based Digital Temperature Sensor, https://www.analog.com/en/resources/technical-articles/curve-fitting-the-error-of-a-bandgapbased-digital-temperature-sensor.html (accessed 30.1.2026)
+Davison A.C., Hinkley D.V., 1997, Bootstrap Methods and their Application. Cambridge: Cambridge University Press (Cambridge Series in Statistical and Probabilistic Mathematics). 
+Efron B, 1979, Bootstrap Methods: Another Look at the Jackknife, The Annals of Statistics, Ann. Statist. 7(1), 1-26, (January), DOI: 10.1214/aos/1176344552
 
 ## Data Sources
 
-Describe your study area, and period of interest. Specify whether training data represents a different location/time period than forecast simulations. Detail the temporal and spatial frequency of your process.
-
-### Published Data Sources
-| Name | Source | Description | Access Method | data DOI/url | metadata DOI/URL| details | data citation |
-|------|--------|-------------|---------------|--------------|-----------------|---------|---------------|
+Example data is provided in the folder "inputs".
 
 ### Data Access Notes
-Many public geospatial data repositories require user authentication to access data. In the methods section, detail which data sources require registraton to access. Link to sign up portals for any listed data sources that require user authentication. In the "How to Reproduce," descripe how to configure automatic access control mechanisms for each data source. 
+-
 
 ### Inputs folder
-Any direct data download links can be pasted into the "datalinks.txt" file in the inputs folder. Specify which dataset links can be accessed via the datalinks.txt folder. Note: this should only be used for PDIs: if the url changes, it will break the reproducibility of your workflow.
 
 Detail any datasets that are in your inputs data folder. Note this is only for data that is too small/trivial to be published: **no files greater than 10 MB can be stored in repository**. Examples might include spatial polygons that have undergone geometry simplification for API searches, text-based keys mapping variable names to integer values, etc.
 
 ## Methods Summary
 
 **Model Framework:** 
-Describe steps involved in data preprocessing
+1) Read CSV data file
+2) Split data into training and testing sets with 80/20 split using a random permutation
+3) From the training data set, randomly select 400 samples (can be duplicates) and separate non-selected samples
+4) Fit regression model to the selected samples.
+5) Test fit against non-selected samples
+6) Repeat steps 3-5 for N times
+7) Compute the mean of regression models and test results from steps 3-6 (mean bootstrap model)
+8) Try the mean bootstrap model against testing set
+9) Fit regression model directly on training set
+10) Try direct regression model against testing set
+11) Save both models and testing results
+
 
 ## Repository Structure
 
@@ -54,12 +66,10 @@ Describe steps involved in data preprocessing
 ## How to Reproduce
 
 ### Computational requirements
-What operating system, processor type, and processor specifications (RAM, cores, etc).
-
-If GPU processing, specify CUDA version.
+Not critical. 
 
 ### Data access configurations
-Describe in detail any access control mechanisms that need to be configured for an individual user to access data (e.g. tokens, cookies, certificates, URL customization). Provide links to documentation.
+NA
 
 ### Run the code
 ```bash
@@ -79,7 +89,7 @@ If you use this software, please cite:
 **APA format**
 
 Janne Erik Torvela (2026).
-*Testproject* (Version 0.1.0).
+*nested_chamber_calibrate* (Version 0.1.0).
 University of Oulu.
 DOI: dummy.url
 
@@ -88,11 +98,11 @@ DOI: dummy.url
 ```bibtex
 @software testproject,
   author = Janne Erik Torvela,
-  title = Testproject,
+  title = nested_chamber_calibrate,
   year = 2026,
   version = 0.1.0,
   doi = dummy.url,
-  url = https://github.com/JTorvela/testproject
+  url = https://github.com/JTorvela/nested_chamber_calibrate
 }
 ```
 or
@@ -113,6 +123,3 @@ Contributions that improve the quality, clarity, and reproducibility of this pro
 * Do not commit large or restricted datasets; respect data licenses.
 By contributing, you agree that your work will be released under the project’s license.
 
-## Notes:
-Focus on graphically rich, interactive elements to communicate your research to diverse stakeholders.
-[Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/markdown-cheatsheet) 
