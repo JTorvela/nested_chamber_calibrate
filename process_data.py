@@ -34,17 +34,18 @@ import re #regular expressions
 #Using a fixed random seed for data sampling to ensure consistency between runs
 np.random.seed(42)
 
+#Batch processing all the sensors? You won't see any plots.
+batch = False
+
 #Data definitions
 filename = "inputs/example_data.csv" 
 out_path = "results/results.csv"     
+figurepath = "figures/"
 
 #Regression parameters
-y_column = "temp.vai" #Vaisala TMP1 precision reference sensor
-n_bootstrap = 10000 #Bootstrap iterations, set 1000 for trial and debugging
-test_size = 0.2 #80/20 split for training and testing
-
-#Batch processing all the sensors? You won't see any plots.
-batch = False
+y_column = "temp.vai"   #Vaisala TMP1 precision reference sensor
+n_bootstrap = 10000     #Bootstrap iterations, set 1000 for trial and debugging
+test_size = 0.2         #split for training and testing
 
 """
 ##################### Main script starts here #################################
@@ -72,7 +73,7 @@ def main():
         for g, cnt in group_counts.items():
             print(f"g{g}.ID0 ... g{g}.ID{cnt-1}  -> {cnt} sensors")
 
- #If we're not running the whole batch, ask the user which sensor they want
+    #If we're not processing the whole batch, ask the user which sensor they want
     if not batch:
         all_ids = [select_x_column(df, y_column)]
     else:
@@ -84,7 +85,6 @@ def main():
         
     # Split data randomly to hold-out and training sets (train and test)
     df_train, df_test = train_test_split(df, test_size)
-
     print(f"Training set samples: {len(df_train)}")
     print(f"Testing set samples: {len(df_test)}")
     print(f"{n_bootstrap} iterations specified.")
@@ -151,8 +151,7 @@ def main():
             "MAE_naive": naive_test_metrics[0],
             "MSE_naive": test_metrics[1],
             "bias_naive": naive_test_metrics[2],
-            }
-            
+            }      
         df_out = pd.DataFrame([row])
             
         #Save the results. Append if file already exists
@@ -165,7 +164,7 @@ def main():
     End of for loop
     """
 
-    #If we are processing only one sensor, we can show the results
+    #If we are processing only one sensor, we can show the results right away
     if not batch:    
         np.set_printoptions(formatter={'float_kind': '{:.8f}'.format})
         print(f"\nBootstrapped {n_bootstrap} times with validation:")
@@ -177,8 +176,7 @@ def main():
         print("                           ax^2         bx          c")
         print("Naive fit model      :", naive_coeffs)    
         print("                     :     MAE         MSE         bias")
-        print("Mean testing error   :", naive_test_metrics)
-                
+        print("Mean testing error   :", naive_test_metrics)                
         print("\nComparing models:      ax^2         bx          c")
         print("Bootstrap mean  :", mean_coeffs)
         print("Naive fit model :", naive_coeffs)
@@ -195,7 +193,7 @@ def main():
         plt.grid(alpha=0.3)
         plt.tight_layout()
         #plt.show()
-        figurename = f"figures/Errorplot_{x_column}.png"
+        figurename = f"{figurepath}Errorplot_{x_column}.png"
         plt.savefig(figurename, dpi = 100)
         plt.close()
         print("Saved:", figurename)
@@ -263,7 +261,6 @@ def train_test_split(df: pd.DataFrame, test_size: float = 0.2):
     df_test = df.iloc[test_idx].reset_index(drop=True)
     return df_train, df_test
 
-
 def bootstrap_sample_rows(x_length):
     """
     Sample random rows of rata with replacement. Return two arrays 
@@ -319,7 +316,7 @@ def plot_residuals(x, y, coeffs, modelname):
     plt.title(f"Residual Plot {modelname}")
     plt.ylim(-0.2, 0.2)
     #plt.show()
-    figurename = f"figures/{modelname}.png"
+    figurename = f"{figurepath}{modelname}.png"
     plt.savefig(figurename, dpi = 100)
     plt.close()
     print("Saved:", figurename)
