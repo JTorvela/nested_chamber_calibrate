@@ -1,4 +1,4 @@
-name: spyder-runtime
+name: nested_chamber_calibrate
 channels:
   - conda-forge
   - conda-forge/label/spyder_rc
@@ -292,4 +292,4 @@ dependencies:
   - zstd=1.5.7=h534d264_6
   - pip:
       - scipy==1.17.0
-prefix: C:\Users\Janne\AppData\Local\spyder-6\envs\spyder-runtime
+
