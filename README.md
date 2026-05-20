@@ -14,7 +14,10 @@ A distribution-independent resampling method known as bootstrapping is used to a
 
 To ensure that the comparisons between a reference sensor and the sensors being calibrated are valid, we must ensure that all sensors have stabilized to the same temperature inside an isolated enclosure (Elyounsi, Kalashnikov 2021). This was accomplished by placing the batch of sensors inside an insulated box with a large thermal mass in the form of a heavy aluminium heatsink with radiating fins. Small computer fans provide sufficient mixing and transfer of heat within the insulated container. The fins of the aluminium heatsink are exposed to the outside of the box, enabling heat exchange with the environment. The box was then placed inside an environmental simulation chamber and cycled between -40 C and +40 C in discrete steps over two days with continuous uninterrupted logging of data from all sensors. This nested chamber design diminishes the effect of thermostat hysteresis of the environmental simulation chamber. The reference sensor is a Vaisala TMP-1 platinum resistance sensor calibrated to a certified accuracy better than +/- 0.01 C over the measured temperature range. The system was allowed to stabilize for two hours at each temperature, and 400 points of data were manually selected from each step. 
 
-This project repository contains a set of measured data for a single batch of DS18B20 type temperature sensors and an example script for the process of deriving the calibration functions for each sensor.  
+This project repository contains a set of measured data for a single batch of DS18B20 type temperature sensors and an example script for the process of deriving the calibration functions for each sensor. 
+
+The default script identifies the sensors according to group and ID number, in the format "g_.ID_". To select a sensor from any of the listed groups for analysis, type in e.g. "g1.ID5". To process the entire set of sensors at once, change batch = True in the script. 
+
 
 References:
 
@@ -57,11 +60,9 @@ The file "example_data.csv" contains a cleaned data log of the reference sensor 
 | Folder/File | Description |
 |-------------|-------------|
 | notebooks/ | SE1–SE4 notebooks |
-| inputs/ | minimal input data required, note most data should be stored on OGC/FAIR compliant databases and accessed from stable URLs |
-| ../raw_data/ | data downloaded from stable URLs/PDIs |
-| ../processed_data/ | analysis-ready datasets |
-| model_data/ | Saved model outputs, model configuration files, predictions|
-| figures/ | Figures, tables, graphs, and data-derivatives (e.g. summary statistics) displayed in manuscript text |
+| inputs/ | Example data set |
+| results/ | Saved model outputs |
+| figures/ | Saved figures for individual sensor tests (not batch operation) |
 | run_reproducibility.py | Reproducibility wrapper |
 | Dockerfile | Reproducible container |
 | CITATION.cff | Citation metadata, sourced directly from Zenodo |
@@ -70,14 +71,18 @@ The file "example_data.csv" contains a cleaned data log of the reference sensor 
 
 ### Computational requirements
 Not critical. 
+Note: if you set batch = True in the script, bootstrapping with 10,000 iterations for 135 sensors may take an hour or two. 
 
-### Data access configurations
-NA
+### Environment
+Developed in Spyder 6. If needed, run: 
+```bash
+conda env create -f environment.yml
+conda activate nested_chamber_calibrate
+```
 
 ### Run the code
 ```bash
-pip install -r requirements.txt
-python run_reproducibility.py
+python process_data.py
 ```
 ## Results
 
