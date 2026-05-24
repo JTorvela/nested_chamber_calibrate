@@ -8,15 +8,13 @@
 ## Project Overview
 Batch calibration analysis of DS18B20 temperature sensors.
 
-The error characteristic of a DS18B20 digital temperature sensors is described by the manufacturer as a second order curve (Maxim Integrated 2002). To compensate for the error, we need to find the calibration function coefficients ax + bx^2 + c for each sensor. Since the output of the sensor is not continuously variable but quantized in icrements of 0.0625 C (Maxim Integrated 2019), sensor noise and other variations cause each sensor to switch randomly between discrete values and the resulting distribution does not fall neatly around a mean. This statistical property may cause biases when fitting the regresson model to find the calibration function coefficients. 
+**This project repository contains a set of measured data for a batch of DS18B20 type temperature sensors and an example script for the process of deriving the calibration function for each sensor. At default, the script identifies and lists the sensors by group and ID number, in the format "g_.ID_". To select a sensor  for analysis, run the script and type in e.g. "g1.ID5". To process the entire set of sensors at once, change "batch = True" in the code.**
 
-A distribution-independent resampling method known as bootstrapping is used to assess the real properties of the distribution underlying the sample. This method involves randomly selecting a portion of the data, fitting the regression model to the selection, and testing the model against the remaining data, repeating thousands of times. The mean of the regression model results can then be used as the final calibration function. (Efron 1979; Davison 1997). In the example script, a comparison is made between a bootstrapped model and directly fitting a regression model to the available data without resampling, using an 80/20 split between model training and validation. This comparison is made to see whether the bootstrapping method is necessary for useful results. 
+The error characteristic of a DS18B20 digital temperature sensors is described by the manufacturer as a second order curve (Maxim Integrated 2002). To compensate for the error, we need to find the calibration function coefficients ax + bx^2 + c for each sensor. Since the output of the sensor is not continuously variable but quantized in increments of 0.0625 C (Maxim Integrated 2019), sensor noise and other variations cause each sensor to switch randomly between two or more values and the resulting distribution does not fall neatly around a mean. This statistical property may cause biases when fitting a regresson model for the calibration function coefficients. 
 
-To make sure the sampled data itself is valid, we must ensure that all sensors have stabilized to the same temperature inside an isolated enclosure (Elyounsi, Kalashnikov 2021). This was accomplished by placing the batch of sensors inside an insulated box with a large thermal mass in the form of a heavy aluminium heatsink with radiating fins. Small computer fans provided mixing and transfer of heat inside the container. The fins of the aluminium heatsink were exposed to the outside of the box to exchange heat with the environment. The box was then placed inside an environmental simulation chamber and cycled from -40 C to +40 C in discrete steps over two days with continuous uninterrupted logging of data from all sensors. The system was allowed to stabilize for two hours at each temperature and the data samples for each temperature setting were selected from the end of each period. The nested chamber design reduces the effect of thermostat hysteresis of the environmental simulation chamber to allow the sensor temperatures to stabilize. 
+A simple regression fit and validation would be done by splitting the data into training and hold-out sets, usually in a 80:20 ratio. The regression model is fitted to the training set and the model predictions are tested with the hold-out set which the model has not seen. Here, instead of directly fitting the model, a distribution-independent resampling method known as bootstrapping may be used to assess the real properties of the distribution underlying the sample. This method involves selecting a random sample of the training data, fitting the regression model to the selection, and validating the model against the data which was not randomly selected previously, repeating many times. The average regression model is then used and tested against the hold-out set as before. (Efron 1979; Davison 1997). In the example script, a comparison is made between a bootstrapped model and naive model fitting without resampling to see whether the bootstrapping method is necessary for useful results.
 
-This project repository contains a set of measured data for a single batch of DS18B20 type temperature sensors and an example script for the process of deriving the calibration functions for each sensor. 
-
-The default script identifies the sensors according to group and ID number, in the format "g_.ID_". To select a sensor from any of the listed groups for analysis, type in e.g. "g1.ID5". To process the entire set of sensors at once, change batch = True in the script. 
+To make sure the sampled data itself is valid, an isolated enclosure should be used to stabilize the temperature between the sensors (Elyounsi, Kalashnikov 2021). This was done by placing the batch of sensors and a precision reference thermometer inside a box made of foam insulation. Small computer fans were used for mixing the interior air continuously to transfer heat between the sensors. A large and heavy aluminium heatsink with the radiating fins exposed to the outside of the box was used to exchange heat with the environment and to slow down temperature fluctuations. The box was then placed inside an environmental simulation chamber and cycled from -40 C to +40 C in discrete steps over two days with continuous logging of data every five seconds from all sensors. The temperature was allowed to stabilize for two hours at each step. This nested chamber design was chosen to minimize the effect of thermostat hysteresis causing small temperature fluctuations in the outer chamber. 
 
 
 References:
@@ -37,34 +35,33 @@ Example data is provided in the folder "inputs".
 
 ### Inputs folder
 
-The file "example_data.csv" contains a cleaned data log of the reference sensor and 135 individual DS18B20 sensors in the batch with 5 second sampling interval. The raw data was manually trimmed to include the steady state temperature after each temperature step. 
+The file "example_data.csv" contains a cleaned data log of the precision reference sensor and 135 individual DS18B20 sensors in the batch with 5 second sampling interval. The raw data was manually trimmed to include the steady state temperature after each temperature step. 
 
 ## Methods Summary
 
 **Model Framework:** 
 1) Read CSV data file
 2) Split data into training and testing sets with 80/20 split using a random permutation
-3) From the training data set, randomly select 400 samples (can be duplicates) and separate non-selected samples
-4) Fit regression model to the selected samples.
-5) Test fit against non-selected samples
+3) From the training data, select randomly with replacement and separate non-selected samples for validation later. 
+4) Fit regression model to the randomly selected samples.
+5) Test fit against non-selected samples.
 6) Repeat steps 3-5 for N times
-7) Compute the mean of regression models and test results from steps 3-6 (mean bootstrap model)
+7) Compute the mean regression model and validation results from steps 3-6 (mean bootstrap model, validation metrics)
 8) Try the mean bootstrap model against testing set
 9) Fit regression model directly on training set
 10) Try direct regression model against testing set
-11) Save both models and testing results
+11) Save resulting models and all metrics to CSV output file
 
 
 ## Repository Structure
 
 | Folder/File | Description |
 |-------------|-------------|
-| notebooks/ | SE1–SE4 notebooks |
 | inputs/ | Example data set |
 | results/ | Saved model outputs |
 | figures/ | Saved figures for individual sensor tests (not batch operation) |
-| run_reproducibility.py | Reproducibility wrapper |
-| Dockerfile | Reproducible container |
+| process_data.py | main process script |
+| environment.yml | Conda environment from Spyder 6 |
 | CITATION.cff | Citation metadata, sourced directly from Zenodo |
 
 ## How to Reproduce
